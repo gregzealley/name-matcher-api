@@ -15,9 +15,6 @@
     <description>API for matching lists of names</description>
 
     <properties>
-        <unit-tests.skip>false</unit-tests.skip>
-        <integration-tests.skip>true</integration-tests.skip>
-
         <java.version>1.8</java.version>
         <junit.version>4.13</junit.version>
         <restassured.version>4.2.0</restassured.version>
@@ -60,49 +57,35 @@
             <version>${restassured.version}</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>${unit-tests.skip}</skipTests>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
-                </configuration>
+                <version>2.22.2</version>
             </plugin>
+
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <useFile>false</useFile>
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>integration-test</id>
+                        <id>failsafe-integration-tests</id>
+                        <phase>integration-test</phase>
                         <goals>
                             <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
-                        <configuration>
-                            <skipTests>${integration-tests.skip}</skipTests>
-                            <includes>
-                                <include>**/*IT.class</include>
-                            </includes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>integration</id>
-            <properties>
-                <unit-tests.skip>false</unit-tests.skip>
-                <integration-tests.skip>false</integration-tests.skip>
-            </properties>
-        </profile>
-    </profiles>
 </project>
