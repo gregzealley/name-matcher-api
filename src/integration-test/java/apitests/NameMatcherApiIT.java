@@ -1,5 +1,6 @@
-package com.gregzealley.namematcherapi;
+package apitests;
 
+import com.gregzealley.namematcherapi.NameMatcherApiApplication;
 import io.restassured.RestAssured;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static io.restassured.RestAssured.when;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = NameMatcherApiApplication.class)
 public class NameMatcherApiIT {
 
     @LocalServerPort
