@@ -1,1 +1,4 @@
 language: java
+
+## Run integration tests
+script: "mvn verify -Pintegration-test"
