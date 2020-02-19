@@ -8,18 +8,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-public class GetController {
+public class PostController {
 
     NameMatcherService nameMatcherService;
 
-    public GetController(final NameMatcherService nameMatcherService) {
+    public PostController(final NameMatcherService nameMatcherService) {
         this.nameMatcherService = nameMatcherService;
     }
 
     @RequestMapping(value = "/uploadfiles", method = RequestMethod.POST)
     public String uploadPrimaryFile(@RequestParam(value = "primary_file") MultipartFile primaryFile,
                                     @RequestParam(value = "secondary_file") MultipartFile secondaryFile) {
-
 
         return nameMatcherService.initiateMatch(primaryFile, secondaryFile);
     }
