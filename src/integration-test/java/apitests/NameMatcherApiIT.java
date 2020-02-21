@@ -49,7 +49,7 @@ public class NameMatcherApiIT {
     }
 
     @Test
-    public void whenPostTwoEmptyFilesThenGetCorrectOkStatusAndCorrectMessage() {
+    public void whenPostTwoEmptyTxtFilesThenGetOkStatusAndCorrectMessage() {
 
         File file1 = readFileFromTestResources("api_test_files/txt_file_empty_1.txt");
         File file2 = readFileFromTestResources("api_test_files/txt_file_empty_2.txt");
