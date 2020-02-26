@@ -2,3 +2,8 @@ language: java
 
 ## Run integration tests
 script: "mvn verify -Pintegration-test"
+
+## Only build when merging into master
+branches:
+  only:
+    - "master"
