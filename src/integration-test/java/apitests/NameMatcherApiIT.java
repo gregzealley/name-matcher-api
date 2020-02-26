@@ -14,10 +14,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,49 +79,21 @@ public class NameMatcherApiIT {
 
     }
 
-    @Test
-    public void whenPostNoFilesThenGetMalformedRequestStatus() {
-
-        ExtractableResponse<Response> response = nameMatcherApiTestService.callUploadFiles("","");
-
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.SC_BAD_REQUEST);
-    }
-
-    //TODO toString results in filepath not content
-    @Test
-    public void whenPostOnlyPrimaryFileThenGetMalformedRequestStatus() throws IOException {
-
-        //String primaryFile = readFile(Paths.get("api_test_files/txt_file_populated_1.txt"), StandardCharsets.UTF_8);
-
-        File file1 = readFileFromTestResources("api_test_files/txt_file_populated_1.txt");
-        String primaryFile = file1.toString();
-
-        File file2 = readFileFromTestResources("api_test_files/txt_file_populated_2.txt");
-        String secondaryFile = file2.toString();
-
-        ExtractableResponse<Response> response = nameMatcherApiTestService.callUploadFiles(primaryFile,secondaryFile);
-
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.SC_OK);
-    }
-
-    @Test
-    public void whenPostOnlySecondaryFileThenGetMalformedRequestStatus() {}
-
-    @Test
-    public void whenPostOneNonTextFileThenGetGetMalformedRequestStatus() {}
+//    @Test
+//    public void whenPostNoFilesThenGetMalformedRequestStatus() {}
+//
+//    @Test
+//    public void whenPostOnlyPrimaryFileThenGetMalformedRequestStatus() {}
+//
+//    @Test
+//    public void whenPostOnlySecondaryFileThenGetMalformedRequestStatus() {}
+//
+//    @Test
+//    public void whenPostOneNonTextFileThenGetGetMalformedRequestStatus() {}
 
     private File readFileFromTestResources(final String filename) {
 
         ClassLoader classLoader = getClass().getClassLoader();
         return new File(Objects.requireNonNull(classLoader.getResource(filename)).getFile());
-    }
-
-    private String readFile(Path path, Charset encoding) throws IOException
-    {
-
-        byte[] encoded = Files.readAllBytes(path);
-        return new String(encoded, encoding);
     }
 }

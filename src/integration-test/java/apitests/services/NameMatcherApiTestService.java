@@ -19,15 +19,4 @@ public class NameMatcherApiTestService {
                 .then()
                 .extract();
     }
-
-    public ExtractableResponse<Response> callUploadFiles(final String primaryFile, final String secondaryFile) {
-
-        return given()
-                .multiPart("primary_file", primaryFile)
-                .multiPart("secondary_file", secondaryFile)
-                .when()
-                .post("uploadfiles")
-                .then()
-                .extract();
-    }
 }
