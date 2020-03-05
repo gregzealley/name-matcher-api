@@ -1,9 +1,13 @@
 language: java
 
-## Run integration tests
-script: "mvn verify -Pintegration-test"
+before_install:
+  - chmod +x build.sh
 
-## Only build when merging into master
+script: ./build.sh
+
+after_success:
+  - docker build -t gregzealley/name-matcher-api .
+
 branches:
   only:
     - "master"
