@@ -4,7 +4,7 @@ before_install:
   - docker build -t gregzealley/name-matcher-api .
 
 ## Run integration tests
-script: "mvn verify -Pintegration-test"
+script: ./build.sh
 
 ## Only build when merging into master
 branches:
