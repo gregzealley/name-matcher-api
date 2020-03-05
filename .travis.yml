@@ -1,5 +1,8 @@
 language: java
 
+before_install:
+  - docker build -t gregzealley/name-matcher-api .
+
 ## Run integration tests
 script: "mvn verify -Pintegration-test"
 
