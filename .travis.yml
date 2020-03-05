@@ -1,10 +1,10 @@
 language: java
 
-before_install:
-  - docker build -t gregzealley/name-matcher-api .
-
 ## Run integration tests
 script: ./build.sh
+
+after_success:
+  - docker build -t gregzealley/name-matcher-api .
 
 ## Only build when merging into master
 branches:
