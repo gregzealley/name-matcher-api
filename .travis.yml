@@ -1,12 +1,13 @@
 language: java
 
-## Run integration tests
+before_install:
+  - chmod +x build.sh
+
 script: ./build.sh
 
 after_success:
   - docker build -t gregzealley/name-matcher-api .
 
-## Only build when merging into master
 branches:
   only:
     - "master"
