@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 public class PostController {
 
@@ -18,9 +20,9 @@ public class PostController {
 
     @RequestMapping(value = "/uploadfiles", method = RequestMethod.POST)
     public String uploadPrimaryFile(@RequestParam(value = "primary_file") MultipartFile primaryFile,
-                                    @RequestParam(value = "secondary_file") MultipartFile secondaryFile) {
+                                    @RequestParam(value = "secondary_file") MultipartFile secondaryFile) throws IOException {
 
-        return nameMatcherService.initiateMatch(primaryFile, secondaryFile);
+        return nameMatcherService.coordinateNameMatching(primaryFile, secondaryFile);
     }
 }
 

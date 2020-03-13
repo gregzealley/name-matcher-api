@@ -1,41 +1,67 @@
 package com.gregzealley.namematcherapi.services;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.gregzealley.namematcherapi.models.Person;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class NameMatcherService {
 
-    private final String NEW_LINE_REGEX = "[\\r\\n]+";
+    private List<Person> primaryFileContent;
+    private List<Person> secondaryFileContent;
 
-    private String[] primaryFileContent;
-    private String[] secondaryFileContent;
+    public String coordinateNameMatching(final MultipartFile primaryFile, final MultipartFile secondaryFile) throws IOException {
 
-    public String initiateMatch(final MultipartFile primaryFile, final MultipartFile secondaryFile) {
-
-        primaryFileContent = importFileIntoArray(primaryFile);
-        secondaryFileContent = importFileIntoArray(secondaryFile);
+        importFiles(primaryFile, secondaryFile);
+        matchNames();
 
         return String.format("There are %s rows in the primary file and %s in the secondary file.",
-                primaryFileContent.length, secondaryFileContent.length);
+                primaryFileContent.size(), secondaryFileContent.size());
     }
 
-    private String[] importFileIntoArray(MultipartFile file) {
+    private void importFiles(MultipartFile primaryFile, MultipartFile secondaryFile) throws IOException {
+        primaryFileContent = importCsvFile(primaryFile);
+        secondaryFileContent = importCsvFile(secondaryFile);
+    }
 
-        String[] fileContent = new String[0];
+    private void matchNames() {
+        // logic to match names will go here
+    }
 
-        if (!file.isEmpty()) {
-            try {
-                byte[] bytes = file.getBytes();
-                String completeData = new String(bytes);
+    private List<Person> importCsvFile(MultipartFile file) throws IOException {
 
-                fileContent = completeData.split(NEW_LINE_REGEX);
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
-            }
-        }
-        return fileContent;
+        CsvMapper mapper = new CsvMapper();
+        CsvSchema schema = mapper.schemaFor(Person.class);
+
+        File csvFile = convertMultiPartToFile(file);
+
+        MappingIterator<Person> personMappingIterator = mapper.readerFor(Person.class).with(schema).readValues(csvFile);
+
+        deleteLocalFileAfterUse(csvFile);
+
+        return personMappingIterator.readAll();
+    }
+
+    private void deleteLocalFileAfterUse(File file) {
+        file.delete();
+    }
+
+    private File convertMultiPartToFile(MultipartFile file) throws IOException {
+
+        File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+        FileOutputStream fos = new FileOutputStream(convFile);
+        fos.write(file.getBytes());
+        fos.close();
+
+        return convFile;
     }
 }
