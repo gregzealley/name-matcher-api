@@ -1,5 +1,7 @@
 Match Type One - Surname and Forename identical and unique
+
 	* P and S empty
+
 	* P file empty, S has content
 	* P has content, S file empty
 	* One name in each, they match
