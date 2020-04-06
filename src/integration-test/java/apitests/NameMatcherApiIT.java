@@ -7,7 +7,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +17,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +30,7 @@ public class NameMatcherApiIT {
 
     private NameMatcherApiTestService nameMatcherApiTestService;
 
-    private final String NAME_OF_RESULT_FILE = "result.csv";
+    private final String NAME_OF_GENERATED_RESULT_FILE = "result.csv";
 
     @LocalServerPort
     private int port;
@@ -40,26 +42,28 @@ public class NameMatcherApiIT {
     }
 
     @After
-    public void teardown() {
-        File fileToDelete = new File(NAME_OF_RESULT_FILE);
-        fileToDelete.delete();
+    public void teardown() throws IOException {
+        Files.delete(Paths.get(NAME_OF_GENERATED_RESULT_FILE));
     }
 
     @Test
-    public void whenBothFilesAreEmptyThenNoMatches() {
+    public void whenBothFilesAreEmptyThenNoMatches() throws IOException {
 
         File primFile = readFileFromTestResources("match_type_one/test_one/prim_empty.csv");
         File secFile = readFileFromTestResources("match_type_one/test_one/sec_empty.csv");
         File expectedResult = readFileFromTestResources("match_type_one/test_one/result.csv");
 
         ExtractableResponse<Response> response = nameMatcherApiTestService.callUploadFiles(primFile, secFile);
-        File actualResult = createResultFile(response.asByteArray());
+        File actualResult = createReturnedFile(response.asByteArray());
+        List<String> generatedActualCsvResult = Files.readAllLines(Paths.get(String.valueOf(actualResult)));
 
         assertThat(response.statusCode())
                 .isEqualTo(HttpStatus.SC_OK);
 
-        //TODO Assert file contents not filename !
-        Assert.assertEquals(expectedResult, actualResult);
+        List<String> expectedCsvResult = Files.readAllLines(Paths.get(String.valueOf(expectedResult)));
+
+        assertThat(expectedCsvResult)
+                .isEqualTo(generatedActualCsvResult);
     }
 
     private File readFileFromTestResources(final String filename) {
@@ -68,11 +72,11 @@ public class NameMatcherApiIT {
         return new File(Objects.requireNonNull(classLoader.getResource(filename)).getFile());
     }
 
-    private File createResultFile(byte[] bFile) {
+    private File createReturnedFile(byte[] bFile) {
 
-        try (FileOutputStream fileOuputStream = new FileOutputStream(NAME_OF_RESULT_FILE)) {
+        try (FileOutputStream fileOuputStream = new FileOutputStream(NAME_OF_GENERATED_RESULT_FILE)) {
             fileOuputStream.write(bFile);
-            return new File(NAME_OF_RESULT_FILE);
+            return new File(NAME_OF_GENERATED_RESULT_FILE);
         } catch (IOException e) {
             e.printStackTrace();
         }
