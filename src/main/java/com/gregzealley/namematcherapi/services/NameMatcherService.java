@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.gregzealley.namematcherapi.enums.MatchResultType;
 import com.gregzealley.namematcherapi.models.MatchResult;
 import com.gregzealley.namematcherapi.models.Person;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -22,15 +24,19 @@ public class NameMatcherService {
     private List<Person> primaryFileContent;
     private List<Person> secondaryFileContent;
     private List<MatchResult> matchResults;
+    private String exportCsv;
 
-    public String coordinateNameMatching(final MultipartFile primaryFile, final MultipartFile secondaryFile) throws IOException {
+    public NameMatcherService() {
+        matchResults = new ArrayList<>();
+    }
+
+    public File coordinateNameMatching(final MultipartFile primaryFile, final MultipartFile secondaryFile) throws IOException {
 
         importFiles(primaryFile, secondaryFile);
         matchNames();
         exportToFile();
 
-        return String.format("There are %s rows in the primary file and %s in the secondary file.",
-                primaryFileContent.size(), secondaryFileContent.size());
+        return new File(exportCsv);
     }
 
     private void importFiles(MultipartFile primaryFile, MultipartFile secondaryFile) throws IOException {
@@ -39,13 +45,20 @@ public class NameMatcherService {
     }
 
     private void matchNames() {
-        matchResults = Collections.emptyList();
+
+        MatchResult example = new MatchResult();
+        example.firstName = "Bob";
+        example.lastName = "Smith";
+        example.matchResultType = MatchResultType.NO_MATCH;
+
+        matchResults.add(example);
+        //matchResults = Collections.emptyList();
     }
 
     private void exportToFile() throws JsonProcessingException {
         CsvMapper mapper = new CsvMapper();
         CsvSchema schema = mapper.schemaFor(MatchResult.class).withHeader();
-        mapper.writer(schema).writeValueAsString(matchResults);
+        exportCsv = mapper.writer(schema).writeValueAsString(matchResults);
     }
 
     private List<Person> importCsvFile(MultipartFile file) throws IOException {
