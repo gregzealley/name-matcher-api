@@ -58,6 +58,7 @@ public class NameMatcherApiIT {
         assertThat(response.statusCode())
                 .isEqualTo(HttpStatus.SC_OK);
 
+        //TODO Assert file contents not filename !
         Assert.assertEquals(expectedResult, actualResult);
     }
 
