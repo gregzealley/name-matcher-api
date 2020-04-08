@@ -1,0 +1,35 @@
+Match Type One - Surname and Forename identical and unique
+
+	* P and S empty
+
+	* P file empty, S has content
+	* P has content, S file empty
+	* One name in each, they match
+	* One name in each, they don't match
+	* One name in P, multiple in S, one match
+	* One name in P, multiple in S, no match
+	* Multiple names in P, one in S, one match
+	* Multiple names in P, one in S, no match
+	* Multiple names in both, one name matches
+	* Multiple names in both, many match
+	* Multiple names in both, all match
+
+Surname identical with matching first initial
+
+
+Surname and shortened name match
+
+
+Duplicate name but description fields match
+
+
+Duplicates
+
+
+No match
+
+Other
+ - Names with non-standard chars
+ - Names with spaces
+ - Empty fields
+

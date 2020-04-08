@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,11 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,6 +30,8 @@ public class NameMatcherApiIT {
 
     private NameMatcherApiTestService nameMatcherApiTestService;
 
+    private final String NAME_OF_GENERATED_RESULT_FILE = "result.csv";
+
     @LocalServerPort
     private int port;
 
@@ -33,67 +41,45 @@ public class NameMatcherApiIT {
         nameMatcherApiTestService = new NameMatcherApiTestService();
     }
 
+    @After
+    public void teardown() throws IOException {
+        Files.delete(Paths.get(NAME_OF_GENERATED_RESULT_FILE));
+    }
+
     @Test
-    public void whenPostTwoPopulatedTxtFilesThenGetOkStatusAndCorrectMessage() {
+    public void whenBothFilesAreEmptyThenNoMatches() throws IOException {
 
-        File file1 = readFileFromTestResources("api_test_files/txt_file_populated_1.txt");
-        File file2 = readFileFromTestResources("api_test_files/txt_file_populated_2.txt");
+        File primFile = readFileFromTestResources("match_type_one/test_one/prim_empty.csv");
+        File secFile = readFileFromTestResources("match_type_one/test_one/sec_empty.csv");
 
-        ExtractableResponse<Response> response = nameMatcherApiTestService.callUploadFiles(file1, file2);
+        File expectedResult = readFileFromTestResources("match_type_one/test_one/result.csv");
+        List<String> expectedCsvResult = Files.readAllLines(Paths.get(String.valueOf(expectedResult)));
+
+        ExtractableResponse<Response> response = nameMatcherApiTestService.callUploadFiles(primFile, secFile);
+        File actualResult = createReturnedFile(response.asByteArray());
+        List<String> generatedActualCsvResult = Files.readAllLines(Paths.get(String.valueOf(actualResult)));
 
         assertThat(response.statusCode())
                 .isEqualTo(HttpStatus.SC_OK);
 
-        assertThat(response.body().asString())
-                .isEqualTo("There are 4 rows in the primary file and 3 in the secondary file.");
+        assertThat(expectedCsvResult)
+                .isEqualTo(generatedActualCsvResult);
     }
-
-    @Test
-    public void whenPostTwoEmptyTxtFilesThenGetOkStatusAndCorrectMessage() {
-
-        File file1 = readFileFromTestResources("api_test_files/txt_file_empty_1.txt");
-        File file2 = readFileFromTestResources("api_test_files/txt_file_empty_2.txt");
-
-        ExtractableResponse<Response> response = nameMatcherApiTestService.callUploadFiles(file1, file2);
-
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.SC_OK);
-
-        assertThat(response.body().asString())
-                .isEqualTo("There are 0 rows in the primary file and 0 in the secondary file.");
-    }
-
-    @Test
-    public void whenPostTwoCsvPopulatedFilesThenGetOkStatusAndMessage() {
-
-        File file1 = readFileFromTestResources("api_test_files/csv_file_populated_1.csv");
-        File file2 = readFileFromTestResources("api_test_files/csv_file_populated_2.csv");
-
-        ExtractableResponse<Response> response = nameMatcherApiTestService.callUploadFiles(file1, file2);
-
-        assertThat(response.statusCode())
-                .isEqualTo(HttpStatus.SC_OK);
-
-        assertThat(response.body().asString())
-                .isEqualTo("There are 4 rows in the primary file and 3 in the secondary file.");
-
-    }
-
-//    @Test
-//    public void whenPostNoFilesThenGetMalformedRequestStatus() {}
-//
-//    @Test
-//    public void whenPostOnlyPrimaryFileThenGetMalformedRequestStatus() {}
-//
-//    @Test
-//    public void whenPostOnlySecondaryFileThenGetMalformedRequestStatus() {}
-//
-//    @Test
-//    public void whenPostOneNonTextFileThenGetGetMalformedRequestStatus() {}
 
     private File readFileFromTestResources(final String filename) {
 
         ClassLoader classLoader = getClass().getClassLoader();
         return new File(Objects.requireNonNull(classLoader.getResource(filename)).getFile());
+    }
+
+    private File createReturnedFile(byte[] bFile) {
+
+        try (FileOutputStream fileOuputStream = new FileOutputStream(NAME_OF_GENERATED_RESULT_FILE)) {
+            fileOuputStream.write(bFile);
+            return new File(NAME_OF_GENERATED_RESULT_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
