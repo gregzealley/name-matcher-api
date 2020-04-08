@@ -51,7 +51,9 @@ public class NameMatcherApiIT {
 
         File primFile = readFileFromTestResources("match_type_one/test_one/prim_empty.csv");
         File secFile = readFileFromTestResources("match_type_one/test_one/sec_empty.csv");
+
         File expectedResult = readFileFromTestResources("match_type_one/test_one/result.csv");
+        List<String> expectedCsvResult = Files.readAllLines(Paths.get(String.valueOf(expectedResult)));
 
         ExtractableResponse<Response> response = nameMatcherApiTestService.callUploadFiles(primFile, secFile);
         File actualResult = createReturnedFile(response.asByteArray());
@@ -59,8 +61,6 @@ public class NameMatcherApiIT {
 
         assertThat(response.statusCode())
                 .isEqualTo(HttpStatus.SC_OK);
-
-        List<String> expectedCsvResult = Files.readAllLines(Paths.get(String.valueOf(expectedResult)));
 
         assertThat(expectedCsvResult)
                 .isEqualTo(generatedActualCsvResult);

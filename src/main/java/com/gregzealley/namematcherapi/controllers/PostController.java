@@ -29,14 +29,14 @@ public class PostController {
 
     @RequestMapping(value = "/uploadfiles", method = RequestMethod.POST, produces = "text/csv")
     public void uploadPrimaryFile(@RequestParam(value = "primary_file") MultipartFile primaryFile,
-                                            @RequestParam(value = "secondary_file") MultipartFile secondaryFile,
-                                            HttpServletResponse response) throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+                                  @RequestParam(value = "secondary_file") MultipartFile secondaryFile,
+                                  HttpServletResponse response) throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
 
         List<MatchResult> results = nameMatcherService.coordinateNameMatching(primaryFile, secondaryFile);
 
         String filename = "match_results.csv";
         response.setContentType("text/csv");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + filename + "\"");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
 
         StatefulBeanToCsv<MatchResult> writer = new StatefulBeanToCsvBuilder<MatchResult>(response.getWriter())
                 .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
