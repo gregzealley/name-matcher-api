@@ -17,12 +17,12 @@
     <properties>
         <java.version>1.8</java.version>
         <junit.version>4.13.1</junit.version>
-        <restassured.version>4.2.0</restassured.version>
+        <restassured.version>4.3.1</restassured.version>
         <maven.failsafe.version>2.21.0</maven.failsafe.version>
         <maven.surefire.version>2.21.0</maven.surefire.version>
         <maven.buildhelper.version>3.0.0</maven.buildhelper.version>
-        <jackson.dataformat-csv.version>2.10.2</jackson.dataformat-csv.version>
-        <opencsv.version>5.0</opencsv.version>
+        <jackson.dataformat-csv.version>2.11.3</jackson.dataformat-csv.version>
+        <opencsv.version>5.2</opencsv.version>
     </properties>
 
     <dependencies>
